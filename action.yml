@@ -1,0 +1,28 @@
+name: 'Release Notes Generator'
+description: 'Generates release notes using semantic-release/release-notes-generator'
+author: 'Fredrik Arvidsson'
+outputs:
+  release_notes:
+    description: 'Semantic release notes'
+inputs:
+  github_token:
+    description: 'The Github token used to query this repository, usually ${{ secrets.GITHUB_TOKEN }}'
+    required: true
+  version:
+    description: 'The version of the release'
+    required: true
+  from_tag_exclusive:
+    description: 'The tag where to start gather commits. The tagged commit is not included.'
+    required: true
+  to_tag_inclusive:
+    description: 'The tag where to stop gather commits. The tagged commit is included.'
+    required: true
+outputs:
+  release_notes:
+    description: 'The generated release notes'
+runs:
+  using: 'node12'
+  main: 'lib/main.js'
+branding:
+  icon: 'file-text'
+  color: 'orange'
