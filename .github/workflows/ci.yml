@@ -43,7 +43,6 @@ jobs:
         id: release_notes
         uses: ./
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
           version: ${{ steps.gitversion.outputs.semVer }}
           from_tag_exclusive: ${{ steps.gitversion.outputs.versionSourceSha }}
           to_tag_inclusive: v${{ steps.gitversion.outputs.semVer }}
