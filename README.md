@@ -21,7 +21,7 @@ jobs:
         id: release_notes
         uses: fresa/release-notes-generator@master
         with:
-          version: 2.0.0
+          version: v2.0.0
           from_ref_exclusive: v1.0.1
           to_ref_inclusive: v2.0.0
       - run: echo "${{ steps.release_notes.outputs.release_notes }}"

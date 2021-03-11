@@ -28,7 +28,20 @@ jobs:
         with:
           useConfigFile: true
           configFilePath: .github/version_config.yml
+      - name: Determine Version Output
+        id: versions
+        run: |
+          version=v${{ steps.gitversion.outputs.semVer }}
+          from_ref_exclusive=${{ steps.gitversion.outputs.versionSourceSha }}
+          [[ "${{ github.ref }}" ==  "refs/heads/main" ]] && \
+            to_ref_inclusive=$version || \
+            to_ref_inclusive=${{ steps.gitversion.outputs.sha }}
+
+          echo "::set-output name=version=$version"
+          echo "::set-output name=from_ref_exclusive=$from_ref_exclusive"
+          echo "::set-output name=to_ref_inclusive=$to_ref_inclusive"
       - name: Create tag
+        if: github.ref == 'refs/heads/main'
         uses: actions/github-script@v3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -36,15 +49,13 @@ jobs:
             github.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: "refs/tags/v${{ steps.gitversion.outputs.semVer }}",
+              ref: "refs/tags/${{ steps.versions.outputs.version }}",
               sha: context.sha
             })
       - name: Generate Release Notes
         id: release_notes
         uses: ./
         with:
-          version: ${{ steps.gitversion.outputs.semVer }}
-          from_ref_exclusive: ${{ steps.gitversion.outputs.versionSourceSha }}
-          to_ref_inclusive: v${{ steps.gitversion.outputs.semVer }}
-      - name: Print Release Notes
-        run: echo '${{ steps.release_notes.outputs.release_notes }}'
+          version: ${{ steps.versions.outputs.version }}
+          from_ref_exclusive: ${{ steps.versions.outputs.from_ref_exclusive }}
+          to_ref_inclusive: ${{ steps.versions.outputs.to_ref_inclusive }}
