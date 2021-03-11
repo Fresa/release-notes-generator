@@ -3,7 +3,7 @@ description: 'Generates release notes using semantic-release/release-notes-gener
 author: 'Fredrik Arvidsson'
 inputs:
   github_token:
-    description: 'The Github token used to query this repository, usually \${{ secrets.GITHUB_TOKEN }}'
+    description: 'The Github token used to query this repository, usually `${{ secrets.GITHUB_TOKEN }}'
     required: true
   version:
     description: 'The version of the release'
