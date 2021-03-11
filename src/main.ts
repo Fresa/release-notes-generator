@@ -11,29 +11,11 @@ async function run(): Promise<void> {
 
     const octokit = getOctokit(githubToken);
 
-    let fromRefSha = fromRef;
-    if (fromRef.startsWith('tags/') || fromRef.startsWith('heads/'))
-    {
-        fromRefSha = (await octokit.git.getRef({
-          ...context.repo,
-          ref: fromRef
-        })).data.object.sha;
-    }
-
-    let toRefSha = toRef;
-    if (toRef.startsWith('tags/') || toRef.startsWith('heads/'))
-    {
-      toRefSha = (await octokit.git.getRef({
-        ...context.repo,
-        ref: toRef
-      })).data.object.sha;
-    }
-
     const commits = (
       await octokit.repos.compareCommits({
         ...context.repo,
-        base: fromRefSha,
-        head: toRefSha
+        base: fromRef,
+        head: toRef
       })
     ).data.commits
       .filter((commit) => !!commit.commit.message)

@@ -10,22 +10,24 @@ inputs:
     required: true
   from_ref_exclusive:
     description: >-
-      A reference where to start gather commits. 
+      The first commit reference to start gather commits after. 
       The reference can be a tag, a branch or a commit sha.
-      The reference is not included.
       Examples:
         tags/v1.0.1
+        v1.0.1
         heads/my-branch
+        my-branch
         431880b
     required: true
   to_ref_inclusive:
     description: >-
-      The reference where to stop gather commits. 
+      The last commit reference to include. 
       The reference can be a tag, a branch or a commit sha.
-      The reference is included.
       Examples:
         tags/v2.0.0
+        v2.0.0
         heads/master
+        master
         531c800
     required: true
 outputs:
