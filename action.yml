@@ -3,14 +3,14 @@ description: 'Generates release notes using semantic-release/release-notes-gener
 author: 'Fredrik Arvidsson'
 inputs:
   github_token:
-    description: 'The Github token used to query this repository, usually ${{ secrets.GITHUB_TOKEN }}'
+    description: 'The Github token used to query this repository, usually `${{ secrets.GITHUB_TOKEN }}`'
     required: true
   version:
     description: 'The version of the release'
     required: true
   from_ref_exclusive:
     description: >-
-      The first commit reference to start gather commits after. 
+      The commit reference to gather commits after. 
       The reference can be a tag, a branch or a commit sha.
       Examples:
         tags/v1.0.1
