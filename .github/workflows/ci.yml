@@ -44,7 +44,7 @@ jobs:
         uses: ./
         with:
           version: ${{ steps.gitversion.outputs.semVer }}
-          from_tag_exclusive: ${{ steps.gitversion.outputs.versionSourceSha }}
-          to_tag_inclusive: v${{ steps.gitversion.outputs.semVer }}
+          from_ref_exclusive: ${{ steps.gitversion.outputs.versionSourceSha }}
+          to_ref_inclusive: v${{ steps.gitversion.outputs.semVer }}
       - name: Print Release Notes
         run: echo '${{ steps.release_notes.outputs.release_notes }}'
