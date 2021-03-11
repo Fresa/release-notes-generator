@@ -41,7 +41,7 @@ jobs:
             })
       - name: Generate Release Notes
         id: release_notes
-        uses: ./.github/actions/release-notes-generator
+        uses: ./
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           version: ${{ steps.gitversion.outputs.semVer }}
