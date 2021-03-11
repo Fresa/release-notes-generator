@@ -1,16 +1,19 @@
 {
-  "name": "release-notes-generator-action",
-  "version": "1.0.0",
-  "description": "",
+  "name": "release-notes-generator",
   "main": "lib/main.js",
   "scripts": {
-    "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
+    "build": "tsc",
+    "prettier-check": "prettier --check .",
+    "prettier-format": "prettier --config .prettierrc --write .",
     "prettier-watch": "onchange 'src/**/*.ts' -- prettier --write {{changed}}",
     "lint": "eslint . --ext .ts"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Fresa/release-notes-generator.git"
+  },
+  "author": "Fredrik Arvidsson",
+  "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.2.6",
     "@actions/github": "^4.0.0",

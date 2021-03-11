@@ -5,25 +5,35 @@ import { context, getOctokit } from '@actions/github';
 async function run(): Promise<void> {
   try {
     const version = core.getInput('version');
-    const fromTag = core.getInput('from_tag_exclusive');
-    const toTag = core.getInput('to_tag_inclusive');
+    const fromRef = core.getInput('from_ref_exclusive');
+    const toRef = core.getInput('to_ref_inclusive');
     const githubToken = core.getInput('github_token');
 
     const octokit = getOctokit(githubToken);
-    const fromTagResponse = await octokit.git.getRef({
-      ...context.repo,
-      ref: `tags/${fromTag}`
-    });
-    const toTagResponse = await octokit.git.getRef({
-      ...context.repo,
-      ref: `tags/${toTag}`
-    });
+
+    let fromRefSha = fromRef;
+    if (fromRef.startsWith('tags/') || fromRef.startsWith('heads/'))
+    {
+        fromRefSha = (await octokit.git.getRef({
+          ...context.repo,
+          ref: fromRef
+        })).data.object.sha;
+    }
+
+    let toRefSha = toRef;
+    if (toRef.startsWith('tags/') || toRef.startsWith('heads/'))
+    {
+      toRefSha = (await octokit.git.getRef({
+        ...context.repo,
+        ref: toRef
+      })).data.object.sha;
+    }
 
     const commits = (
       await octokit.repos.compareCommits({
         ...context.repo,
-        base: fromTagResponse.data.object.sha,
-        head: toTagResponse.data.object.sha
+        base: fromRefSha,
+        head: toRefSha
       })
     ).data.commits
       .filter((commit) => !!commit.commit.message)
@@ -40,8 +50,8 @@ async function run(): Promise<void> {
         options: {
           repositoryUrl: `https://github.com/${process.env.GITHUB_REPOSITORY}`
         },
-        lastRelease: { gitTag: fromTag },
-        nextRelease: { gitTag: toTag, version: version }
+        lastRelease: { gitTag: fromRef },
+        nextRelease: { gitTag: toRef, version: version }
       }
     );
 
