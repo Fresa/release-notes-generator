@@ -77,3 +77,4 @@ jobs:
               body: "${{ steps.release_notes.outputs.release_notes }}",
               prerelease: ${{ steps.release.outputs.is_prerelease }}
             });
+ 
