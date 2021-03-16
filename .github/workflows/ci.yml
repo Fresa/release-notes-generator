@@ -42,10 +42,10 @@ jobs:
             to_ref_inclusive=${{ steps.gitversion.outputs.sha }} || \
             to_ref_inclusive=$tag
 
-          echo "::set-output name=is_prerelease=$is_prerelease"
-          echo "::set-output name=tag=$tag"
-          echo "::set-output name=from_ref_exclusive=$from_ref_exclusive"
-          echo "::set-output name=to_ref_inclusive=$to_ref_inclusive"
+          echo "::set-output name=is_prerelease::$is_prerelease"
+          echo "::set-output name=tag::$tag"
+          echo "::set-output name=from_ref_exclusive::$from_ref_exclusive"
+          echo "::set-output name=to_ref_inclusive::$to_ref_inclusive"
       - name: Create tag
         if: steps.release.outputs.is_prerelease == false
         uses: actions/github-script@v3
