@@ -74,6 +74,6 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               tag_name: "${{ steps.release.outputs.tag }}",
-              body: "${{ steps.release_notes.outputs.release_notes }}",
+              body: `${{ steps.release_notes.outputs.release_notes }}`,
               prerelease: ${{ steps.release.outputs.is_prerelease }}
             });
