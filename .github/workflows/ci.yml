@@ -33,7 +33,7 @@ jobs:
         run: |
           tag=v${{ steps.gitversion.outputs.semVer }}
           from_ref_exclusive=${{ steps.gitversion.outputs.versionSourceSha }}
-          
+
           [[ -z "${{ steps.gitversion.outputs.preReleaseNumber }}" ]] && \
             is_prerelease=false || \
             is_prerelease=true
@@ -77,4 +77,3 @@ jobs:
               body: "${{ steps.release_notes.outputs.release_notes }}",
               prerelease: ${{ steps.release.outputs.is_prerelease }}
             });
- 
