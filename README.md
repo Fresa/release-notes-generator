@@ -2,7 +2,7 @@
 
 A Github Action for semantic-release/release-notes-generator
 
-![Build](https://github.com/Fresa/Spdy/workflows/Build/badge.svg)
+[![Build](https://github.com/Fresa/release-notes-generator/actions/workflows/ci.yml/badge.svg)](https://github.com/Fresa/release-notes-generator/actions/workflows/ci.yml)
 
 ## Installation
 
