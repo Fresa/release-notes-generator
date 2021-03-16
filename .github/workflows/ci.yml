@@ -74,7 +74,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               tag_name: "${{ steps.release.outputs.tag }}",
-              target_commitish: ${{ steps.gitversion.outputs.sha }},
+              target_commitish: "${{ steps.gitversion.outputs.sha }}",
               body: `${{ steps.release_notes.outputs.release_notes }}`,
               prerelease: ${{ steps.release.outputs.is_prerelease }}
             });
