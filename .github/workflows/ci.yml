@@ -57,7 +57,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               ref: "refs/tags/${{ steps.release.outputs.tag }}",
-              sha: context.sha
+              sha: "${{ steps.gitversion.outputs.sha }}"
             });
       - name: Generate Release Notes
         if: steps.release.outputs.is_prerelease == false
