@@ -32,20 +32,18 @@ jobs:
         id: release
         run: |
           tag=v${{ steps.gitversion.outputs.semVer }}
-          from_ref_exclusive=${{ steps.gitversion.outputs.versionSourceSha }}
+          from_tag=$(git tag --contains ${{ steps.gitversion.outputs.versionSourceSha }} | grep -m 1 ^v[0-9]*\.[0-9]*\.g[0-9]* | head -1)
+          [[ -z "$from_tag" ]] && \
+            from_ref_exclusive=${{ steps.gitversion.outputs.versionSourceSha }} || \
+            from_ref_exclusive=$from_tag
 
           [[ -z "${{ steps.gitversion.outputs.preReleaseNumber }}" ]] && \
             is_prerelease=false || \
             is_prerelease=true
 
-          [[ $is_prerelease ]] && \
-            to_ref_inclusive=${{ steps.gitversion.outputs.sha }} || \
-            to_ref_inclusive=$tag
-
           echo "::set-output name=is_prerelease::$is_prerelease"
           echo "::set-output name=tag::$tag"
           echo "::set-output name=from_ref_exclusive::$from_ref_exclusive"
-          echo "::set-output name=to_ref_inclusive::$to_ref_inclusive"
       - name: Create tag
         if: steps.release.outputs.is_prerelease == false
         uses: actions/github-script@v3
@@ -59,13 +57,15 @@ jobs:
               sha: context.sha
             });
       - name: Generate Release Notes
+        if: steps.release.outputs.is_prerelease == false
         id: release_notes
         uses: ./
         with:
           version: ${{ steps.release.outputs.tag }}
           from_ref_exclusive: ${{ steps.release.outputs.from_ref_exclusive }}
-          to_ref_inclusive: ${{ steps.release.outputs.to_ref_inclusive }}
+          to_ref_inclusive: ${{ steps.release.outputs.tag }}
       - name: Create Release
+        if: steps.release.outputs.is_prerelease == false
         uses: actions/github-script@v3
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -74,7 +74,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               tag_name: "${{ steps.release.outputs.tag }}",
-              target_commitish: "${{ steps.gitversion.outputs.sha }}",
-              body: `${{ steps.release_notes.outputs.release_notes }}`,
-              prerelease: ${{ steps.release.outputs.is_prerelease }}
+              body: `${{ steps.release_notes.outputs.release_notes }}`
             });
