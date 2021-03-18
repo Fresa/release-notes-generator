@@ -46,6 +46,6 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           message: |
-          ```
-          ${{ steps.release_notes.outputs.release_notes }}
-          ```
+            ```
+            ${{ steps.release_notes.outputs.release_notes }}
+            ```
