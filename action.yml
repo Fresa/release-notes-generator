@@ -72,11 +72,6 @@ runs:
         MATRIX_CONTEXT: ${{ toJSON(matrix) }}
       run: echo "$MATRIX_CONTEXT"
       shell: bash
-    - name: Dump needs context
-      env:
-        NEEDS_CONTEXT: ${{ toJSON(needs) }}
-      run: echo "$NEEDS_CONTEXT"
-      shell: bash
     # - run: |
     #     echo "${{ toJSON(github) }}"
     #     echo "${{ toJSON(env) }}"
