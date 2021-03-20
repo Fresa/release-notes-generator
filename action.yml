@@ -38,8 +38,14 @@ runs:
   using: 'composite'
   steps:
     - run: |
-        cd ${{ github.action_path }}
-        ls -R
+        echo "${{ toJSON(github) }}"
+        echo "${{ toJSON(env) }}"
+        echo "${{ toJSON(job) }}"
+        echo "${{ toJSON(steps) }}"
+        echo "${{ toJSON(runner) }}"
+        echo "${{ toJSON(strategy) }}"
+        echo "${{ toJSON(matrix) }}"
+        echo "${{ toJSON(needs) }}"
       shell: bash
     # - run: curl -L "${github.server_url}/${github.action_repository}/archive/"
     # shell: bash
