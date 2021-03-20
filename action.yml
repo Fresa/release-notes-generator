@@ -39,7 +39,7 @@ runs:
   steps:
     - run: |
         cd ${{ github.action_path }}
-        git rev-parse HEAD
+        ls -R
       shell: bash
     # - run: curl -L "${github.server_url}/${github.action_repository}/archive/"
     # shell: bash
