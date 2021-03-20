@@ -35,8 +35,17 @@ outputs:
   release_notes:
     description: 'Semantic release notes'
 runs:
-  using: 'node12'
-  main: 'lib/main.js'
+  using: 'composite'
+  steps:
+    - run: |
+        cd ${{ github.action_path }}
+        git rev-parse HEAD
+      shell: bash
+    # - run: curl -L "${github.server_url}/${github.action_repository}/archive/"
+    # shell: bash
+# runs:
+#   using: 'node12'
+#   main: 'lib/main.js'
 branding:
   icon: 'file-text'
   color: 'orange'
