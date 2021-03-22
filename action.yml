@@ -87,7 +87,7 @@ outputs:
 runs:
   using: 'node12'
   pre: 'fetch_artifact.js'
-  main: 'main.js'
+  main: 'lib/main.js'
 branding:
   icon: 'file-text'
   color: 'orange'
