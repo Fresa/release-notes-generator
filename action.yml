@@ -34,56 +34,6 @@ inputs:
 outputs:
   release_notes:
     description: 'Semantic release notes'
-# runs:
-#   using: 'composite'
-#   steps:
-#     - name: Dump GitHub context
-#       env:
-#         GITHUB_CONTEXT: ${{ toJSON(github) }}
-#       run: echo "$GITHUB_CONTEXT"
-#       shell: bash
-#     - name: Dump env context
-#       env:
-#         ENV_CONTEXT: ${{ toJSON(env) }}
-#       run: echo "$ENV_CONTEXT"
-#       shell: bash
-#     - name: Dump job context
-#       env:
-#         JOB_CONTEXT: ${{ toJSON(job) }}
-#       run: echo "$JOB_CONTEXT"
-#       shell: bash
-#     - name: Dump steps context
-#       env:
-#         STEPS_CONTEXT: ${{ toJSON(steps) }}
-#       run: echo "$STEPS_CONTEXT"
-#       shell: bash
-#     - name: Dump runner context
-#       env:
-#         RUNNER_CONTEXT: ${{ toJSON(runner) }}
-#       run: echo "$RUNNER_CONTEXT"
-#       shell: bash
-#     - name: Dump strategy context
-#       env:
-#         STRATEGY_CONTEXT: ${{ toJSON(strategy) }}
-#       run: echo "$STRATEGY_CONTEXT"
-#       shell: bash
-#     - name: Dump matrix context
-#       env:
-#         MATRIX_CONTEXT: ${{ toJSON(matrix) }}
-#       run: echo "$MATRIX_CONTEXT"
-#       shell: bash
-# - run: |
-#     echo "${{ toJSON(github) }}"
-#     echo "${{ toJSON(env) }}"
-#     echo "${{ toJSON(job) }}"
-#     echo "${{ toJSON(steps) }}"
-#     echo "${{ toJSON(runner) }}"
-#     echo "${{ toJSON(strategy) }}"
-#     echo "${{ toJSON(matrix) }}"
-#     echo "${{ toJSON(needs) }}"
-#   shell: bash
-# - run: curl -L "${github.server_url}/${github.action_repository}/archive/"
-# shell: bash
 runs:
   using: 'node12'
   pre: 'fetch_artifact.js'
