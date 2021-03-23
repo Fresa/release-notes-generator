@@ -21,6 +21,14 @@ jobs:
         run: npm run prettier-check
       - name: Build
         run: npm run build
+      - name: Test Fetching Artifact
+        run: node fetch_artifact.js
+        env:
+          GITHUB_ACTION_REPOSITORY: Fresa/release-notes-generator
+          GITHUB_ACTION_REF: v0
+          GITHUB_ACTION_PATH: $GITHUB_WORKSPACE
+      - name: Assert Artifact Downloaded
+        run: ls -d $PWD/lib/main.js
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0.9.7
         with:
@@ -75,7 +83,6 @@ jobs:
           tag_name: ${{ steps.release.outputs.tag }}
           prerelease: ${{ steps.release.outputs.is_prerelease }}
           files: lib/main.js
-          fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Update Latest Minor Tag
