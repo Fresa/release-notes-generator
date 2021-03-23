@@ -6,7 +6,6 @@
     "build": "tsc",
     "prettier-check": "prettier --check .",
     "prettier-format": "prettier --config .prettierrc --write .",
-    "prettier-watch": "onchange 'src/**/*.ts' -- prettier --write {{changed}}",
     "lint": "eslint . --ext .ts"
   },
   "repository": {
