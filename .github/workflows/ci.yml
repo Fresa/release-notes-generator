@@ -34,7 +34,6 @@ jobs:
       - name: Determine Release Info
         id: release
         run: |
-          tag=v${{ steps.gitversion.outputs.semVer }}
           from_tag=$(git tag --contains ${{ steps.gitversion.outputs.versionSourceSha }} | grep -m 1 ^v[0-9]*\.[0-9]*\.g[0-9]* | head -1)
           [[ -z "$from_tag" ]] && \
             from_ref_exclusive=${{ steps.gitversion.outputs.versionSourceSha }} || \
@@ -43,6 +42,10 @@ jobs:
           [[ -z "${{ steps.gitversion.outputs.preReleaseNumber }}" ]] && \
             is_prerelease=false || \
             is_prerelease=true
+
+          [[ is_prerelease ]] && \
+            tag=v${{ steps.gitversion.outputs.majorMinorPatch }}-pre-${{ steps.gitversion.outputs.shortSha }} || \
+            tag=v${{ steps.gitversion.outputs.majorMinorPatch }}
 
           echo "::set-output name=is_prerelease::$is_prerelease"
           echo "::set-output name=tag::$tag"
