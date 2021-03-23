@@ -34,7 +34,7 @@ jobs:
       - name: Determine Release Info
         id: release
         run: |
-          from_tag=$(git tag --contains ${{ steps.gitversion.outputs.versionSourceSha }} | grep -m 1 ^v[0-9]*\.[0-9]*\.g[0-9]* | head -1)
+          from_tag=$(git tag --points-at ${{ steps.gitversion.outputs.versionSourceSha }} | grep -m 1 ^v[0-9]*\.[0-9]*\.[0-9]* | head -1)
           [[ -z "$from_tag" ]] && \
             from_ref_exclusive=${{ steps.gitversion.outputs.versionSourceSha }} || \
             from_ref_exclusive=$from_tag
