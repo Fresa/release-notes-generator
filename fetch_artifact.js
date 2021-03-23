@@ -68,7 +68,11 @@ try {
 
     ensureSuccessStatusCode(getReleaseArtifactResponse);
 
-    const artifactPath = `${action_path}/lib/${artifact_name}`;
+    const dir = `${action_path}/lib`;
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    const artifactPath = `${dir}/${artifact_name}`;
     core.debug(`Writing script to ${artifactPath}`);
     const artifactWriter = fs.createWriteStream(artifactPath);
     getReleaseArtifactResponse.data.pipe(artifactWriter);
