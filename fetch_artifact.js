@@ -1,6 +1,6 @@
-import axios from 'axios';
-import * as fs from 'fs';
-import * as core from '@actions/core';
+const axios = require('axios');
+const fs = require('fs');
+const core = require('@actions/core');
 
 try {
   const getEnvironmentVariable = (name) => {
