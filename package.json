@@ -1,6 +1,5 @@
 {
   "name": "release-notes-generator",
-  "type": "module",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
