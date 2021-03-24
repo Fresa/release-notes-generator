@@ -22,9 +22,10 @@ jobs:
       - name: Build
         run: npm run build
       - name: Test Fetching Artifact
-        run: node fetch_artifact.js
+        run: |
+          GITHUB_ACTION_REPOSITORY='Fresa/release-notes-generator' \
+          node fetch_artifact.js
         env:
-          GITHUB_ACTION_REPOSITORY: Fresa/release-notes-generator
           GITHUB_ACTION_REF: v0
           GITHUB_ACTION_PATH: ${{ env.GITHUB_WORKSPACE }}
       - name: Assert Artifact Downloaded
