@@ -4,7 +4,9 @@ const core = require('@actions/core');
 
 const getEnvironmentVariable = (name) => {
   const value = process.env[name];
-  if (value == null) throw new Error(`${name} is not set`);
+  if (['', 'null', 'undefined'].includes(value)) {
+    throw new Error(`${name} is not set`);
+  }
   core.debug(`${name}: ${value}`);
   return value;
 };
