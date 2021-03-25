@@ -1,10 +1,81 @@
-const axios = require('axios');
 const fs = require('fs');
-const core = require('@actions/core');
+const https = require('https');
+const os = require('os');
+
+const core = new (class {
+  setFailed(message) {
+    process.exitCode = 1;
+    this.error(message);
+  }
+
+  debug(message) {
+    process.stdout.write(`::debug::${message}` + os.EOL);
+  }
+
+  info(message) {
+    process.stdout.write(message + os.EOL);
+  }
+
+  error(message) {
+    process.stdout.write(`::error::${message}` + os.EOL);
+  }
+})();
+
+const getAsync = async (url, asStream = false) => {
+  const getAsyncCalback = (url, resolve, reject) => {
+    https.get(
+      url,
+      {
+        headers: {
+          Accept: asStream ? 'text/html' : 'application/vnd.github.v3+json',
+          'User-Agent': 'artifact-downloader'
+        }
+      },
+      (res) => {
+        if (res.statusCode === 301 || res.statusCode === 302) {
+          return getAsyncCalback(res.headers.location, resolve, reject);
+        }
+
+        if (asStream) {
+          return resolve({
+            status: res.statusCode,
+            statusText: res.statusMessage,
+            data: res
+          });
+        }
+
+        let rawData = '';
+        res.on('data', (chunk) => {
+          rawData += chunk;
+        });
+        res.on('end', () => {
+          resolve({
+            status: res.statusCode,
+            statusText: res.statusMessage,
+            data: JSON.parse(rawData)
+          });
+        });
+        res.on('error', (err) => {
+          reject({
+            error: {
+              status: res.statusCode,
+              statusText: res.statusMessage,
+              data: err
+            }
+          });
+        });
+      }
+    );
+  };
+
+  return new Promise((resolve, reject) =>
+    getAsyncCalback(url, resolve, reject)
+  );
+};
 
 const getEnvironmentVariable = (name) => {
   const value = process.env[name];
-  if (['', 'null', 'undefined'].includes(value)) {
+  if (['', null, undefined].includes(value)) {
     throw new Error(`${name} is not set`);
   }
   core.debug(`${name}: ${value}`);
@@ -31,20 +102,21 @@ try {
   const getReleaseArtifact = async (releaseTag) => {
     const url = `${server_url}/${action_repository}/releases/download/${releaseTag}/${artifact_name}`;
     core.info(`Getting release artifact from ${url}`);
-    return axios.get(url, { responseType: 'stream' });
+
+    return getAsync(url, true);
   };
 
   const getReleaseTagFromAnnotatedTag = async (tag) => {
     const url = `${api_url}/repos/${action_repository}/git/refs/tags/${tag}`;
-    console.info(`Getting release tag from ${url}`);
-    const tagResponse = await axios.get(url);
+    core.info(`Getting release tag from ${url}`);
+    const tagResponse = await getAsync(url);
 
     ensureSuccessStatusCode(tagResponse);
 
     if (tagResponse.data.object.type === 'tag') {
       const commitUrl = tagResponse.data.object.url;
       core.info(`Tag found, getting commit from ${commitUrl}`);
-      const refTagResponse = await axios.get(commitUrl);
+      const refTagResponse = await getAsync(commitUrl);
 
       var releaseTag = refTagResponse.data.message.trim();
       core.info(`Tag ${tag} is pointing at release ${releaseTag}`);
@@ -57,20 +129,14 @@ try {
   (async () => {
     try {
       let getReleaseArtifactResponse;
-      try {
-        getReleaseArtifactResponse = await getReleaseArtifact(action_ref);
-      } catch (error) {
-        if (error.response.status !== 404) {
-          throw error;
-        }
-
+      getReleaseArtifactResponse = await getReleaseArtifact(action_ref);
+      if (getReleaseArtifactResponse.status === 404) {
         core.info('Artifact was not found, searching for release');
         const releaseTag = await getReleaseTagFromAnnotatedTag(action_ref);
         getReleaseArtifactResponse = await getReleaseArtifact(releaseTag);
       }
 
       ensureSuccessStatusCode(getReleaseArtifactResponse);
-
       const dir = `${action_path}/lib`;
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
@@ -80,9 +146,9 @@ try {
       const artifactWriter = fs.createWriteStream(artifactPath);
       getReleaseArtifactResponse.data.pipe(artifactWriter);
     } catch (error) {
-      core.setFailed(`Action failed with error ${error}`);
+      core.setFailed(`Action failed. ${error.stack}`);
     }
   })();
 } catch (error) {
-  core.setFailed(`Action failed with error ${error}`);
+  core.setFailed(`Action failed. ${error.stack}`);
 }
