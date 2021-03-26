@@ -20,7 +20,7 @@ jobs:
       - name: Check
         run: npm run prettier-check
       - name: Build
-        run: npm run build
+        run: npm run publish
       - name: Test Fetching Artifact
         run: |
           GITHUB_ACTION_REPOSITORY=Fresa/release-notes-generator \
@@ -81,7 +81,7 @@ jobs:
           body: ${{ steps.release_notes.outputs.release_notes }}
           tag_name: ${{ steps.release.outputs.tag }}
           prerelease: ${{ steps.release.outputs.is_prerelease }}
-          files: lib/main.js
+          files: dist/index.js
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Update Latest Minor Tag

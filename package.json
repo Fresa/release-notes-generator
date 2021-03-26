@@ -3,6 +3,7 @@
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
+    "publish": "ncc build -m src/main.ts",
     "prettier-check": "prettier --check .",
     "prettier-format": "prettier --config .prettierrc --write .",
     "lint": "eslint . --ext .ts"
@@ -16,8 +17,7 @@
   "dependencies": {
     "@actions/core": "^1.2.6",
     "@actions/github": "^4.0.0",
-    "@semantic-release/release-notes-generator": "^9.0.2",
-    "axios": "^0.21.1"
+    "@semantic-release/release-notes-generator": "^9.0.2"
   },
   "devDependencies": {
     "@types/node": "^14.14.33",

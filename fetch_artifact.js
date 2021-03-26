@@ -83,7 +83,7 @@ const getEnvironmentVariable = (name) => {
 };
 
 try {
-  const artifact_name = 'main.js';
+  const artifact_name = 'index.js';
   core.debug(`Artifact name: ${artifact_name}`);
   const action_repository = getEnvironmentVariable('GITHUB_ACTION_REPOSITORY');
   const action_ref = getEnvironmentVariable('GITHUB_ACTION_REF');
@@ -137,7 +137,7 @@ try {
       }
 
       ensureSuccessStatusCode(getReleaseArtifactResponse);
-      const dir = `${action_path}/lib`;
+      const dir = `${action_path}/dist`;
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
       }
