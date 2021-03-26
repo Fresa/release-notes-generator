@@ -15,6 +15,9 @@ jobs:
         with:
           # Fetches entire history, so we can analyze commits since last tag
           fetch-depth: 0
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 12
       - name: Install
         run: npm ci
       - name: Check
@@ -25,10 +28,9 @@ jobs:
         run: |
           GITHUB_ACTION_REPOSITORY=Fresa/release-notes-generator \
           GITHUB_ACTION_REF=vTEST \
-          GITHUB_ACTION_PATH=$GITHUB_WORKSPACE \
           node fetch_artifact.js
       - name: Assert Artifact Downloaded
-        run: ls -d $PWD/dist/index.js
+        run: ls -d $GITHUB_WORKSPACE/dist/index.js
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v0.9.7
         with:
