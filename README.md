@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          # Fetches entire history, so we can analyze commits since last tag
+          # Fetches entire history, so we can analyze commits
           fetch-depth: 0
       - name: Generate release notes
         id: release_notes
@@ -32,14 +32,14 @@ jobs:
 - **github_token** _(required)_ - The Github token used to query this repository.(default: `${{ github.token }}`)
 - **version** _(required)_ - The version of the release.
   Example: 2.4.0
-- **from_tag_exclusive** _(required)_ - The tag where to start gather commits. The tagged commit is not included.
+- **from_ref_exclusive** _(required)_ - The reference where to start gather commits. The referenced commit is not included.
   Examples:
   - tags/v1.0.1
   - v1.0.1
   - heads/my-branch
   - my-branch
   - 431880b
-- **to_tag_inclusive** _(required)_ - The tag where to stop gather commits. The tagged commit is included.
+- **to_ref_inclusive** _(required)_ - The reference where to stop gather commits. The referenced commit is included.
   Examples:
   - tags/v2.0.0
   - v2.0.0
