@@ -1,0 +1,34 @@
+{
+  "name": "release-notes-generator",
+  "main": "lib/main.js",
+  "scripts": {
+    "build": "tsc",
+    "publish": "ncc build -m src/main.ts",
+    "prettier-check": "prettier --check .",
+    "prettier-format": "prettier --config .prettierrc --write .",
+    "lint": "eslint . --ext .ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Fresa/release-notes-generator.git"
+  },
+  "author": "Fredrik Arvidsson",
+  "license": "MIT",
+  "dependencies": {
+    "@actions/core": "^1.2.6",
+    "@actions/github": "^4.0.0",
+    "@semantic-release/release-notes-generator": "^9.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.33",
+    "@typescript-eslint/eslint-plugin": "^4.17.0",
+    "@typescript-eslint/parser": "^4.17.0",
+    "@vercel/ncc": "^0.27.0",
+    "eslint": "^7.21.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-prettier": "^3.3.1",
+    "onchange": "^7.1.0",
+    "prettier": "^2.2.1",
+    "typescript": "^4.2.3"
+  }
+}

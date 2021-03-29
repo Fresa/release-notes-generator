@@ -1,0 +1,43 @@
+name: 'Release Notes Generator'
+description: 'Generates release notes using semantic-release/release-notes-generator'
+author: 'Fredrik Arvidsson'
+inputs:
+  github_token:
+    description: 'The Github token used to query this repository'
+    required: true
+    default: ${{ github.token }}
+  version:
+    description: 'The version of the release'
+    required: true
+  from_ref_exclusive:
+    description: >-
+      The commit reference to gather commits after. 
+      The reference can be a tag, a branch or a commit sha.
+      Examples:
+        tags/v1.0.1
+        v1.0.1
+        heads/my-branch
+        my-branch
+        431880b
+    required: true
+  to_ref_inclusive:
+    description: >-
+      The last commit reference to include. 
+      The reference can be a tag, a branch or a commit sha.
+      Examples:
+        tags/v2.0.0
+        v2.0.0
+        heads/master
+        master
+        531c800
+    required: true
+outputs:
+  release_notes:
+    description: 'Semantic release notes'
+runs:
+  using: 'node12'
+  pre: 'fetch_artifact.js'
+  main: 'dist/index.js'
+branding:
+  icon: 'file-text'
+  color: 'orange'
