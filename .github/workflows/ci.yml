@@ -77,13 +77,15 @@ jobs:
           version: ${{ steps.release.outputs.tag }}
           from_ref_exclusive: ${{ steps.release.outputs.from_ref_exclusive }}
           to_ref_inclusive: ${{ steps.release.outputs.tag }}
+      - name: Package
+        run: zip -rj artifacts.zip dist
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           body: ${{ steps.release_notes.outputs.release_notes }}
           tag_name: ${{ steps.release.outputs.tag }}
           prerelease: ${{ steps.release.outputs.is_prerelease }}
-          files: dist/index.js
+          files: artifacts.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Update Latest Minor Tag

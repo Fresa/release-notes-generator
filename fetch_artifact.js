@@ -1,6 +1,7 @@
 const fs = require('fs');
 const https = require('https');
 const os = require('os');
+const spawn = require('child_process').spawn;
 
 const core = new (class {
   setFailed(message) {
@@ -12,12 +13,12 @@ const core = new (class {
     process.stdout.write(`::debug::${message}` + os.EOL);
   }
 
-  info(message) {
-    process.stdout.write(message + os.EOL);
+  info(message, eol = true) {
+    process.stdout.write(message + (eol ? os.EOL : ''));
   }
 
-  error(message) {
-    process.stdout.write(`::error::${message}` + os.EOL);
+  error(message, eol = true) {
+    process.stdout.write(`::error::${message}` + (eol ? os.EOL : ''));
   }
 })();
 
@@ -83,7 +84,7 @@ const getEnvironmentVariable = (name) => {
 };
 
 try {
-  const artifact_name = 'index.js';
+  const artifact_name = 'artifacts.zip';
   core.debug(`Artifact name: ${artifact_name}`);
   const action_repository = getEnvironmentVariable('GITHUB_ACTION_REPOSITORY');
   const action_ref = getEnvironmentVariable('GITHUB_ACTION_REF');
@@ -144,6 +145,23 @@ try {
       core.debug(`Writing script to ${artifactPath}`);
       const artifactWriter = fs.createWriteStream(artifactPath);
       getReleaseArtifactResponse.data.pipe(artifactWriter);
+      artifactWriter.on('error', (err) => {
+        core.setFailed(`Could not write artifact to disk. ${err}`);
+      });
+      artifactWriter.on('finish', () => {
+        var unzip = spawn('unzip', ['-o', '-d', dir, artifactPath]);
+        unzip.stdout.on('data', (data) => {
+          core.info(data, false);
+        });
+        unzip.stderr.on('data', function (data) {
+          core.error(data, false);
+        });
+        unzip.on('exit', function (code) {
+          if (code !== 0) {
+            core.setFailed(`Could not unzip artifacts. Error code: ${code}`);
+          }
+        });
+      });
     } catch (error) {
       core.setFailed(`Action failed. ${error.stack}`);
     }
