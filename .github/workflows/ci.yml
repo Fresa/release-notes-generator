@@ -90,13 +90,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Update Latest Minor Tag
         uses: EndBug/latest-tag@v1
-        if: steps.release.outputs.is_prerelease == false
+        if: steps.release.outputs.is_prerelease == 'false'
         with:
           tag-name: v${{ steps.gitversion.outputs.major }}
           description: ${{ steps.release.outputs.tag }}
       - name: Update Latest Patch Tag
         uses: EndBug/latest-tag@v1
-        if: steps.release.outputs.is_prerelease == false
+        if: steps.release.outputs.is_prerelease == 'false'
         with:
           tag-name: v${{ steps.gitversion.outputs.major }}.${{ steps.gitversion.outputs.minor }}
           description: ${{ steps.release.outputs.tag }}
