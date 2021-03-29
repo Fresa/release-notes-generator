@@ -53,7 +53,7 @@ jobs:
             is_prerelease=false || \
             is_prerelease=true
 
-          [[ is_prerelease ]] && \
+          [[ $is_prerelease == true ]] && \
             tag=v${{ steps.gitversion.outputs.majorMinorPatch }}-pre-${{ steps.gitversion.outputs.shortSha }} || \
             tag=v${{ steps.gitversion.outputs.majorMinorPatch }}
 
