@@ -1,6 +1,6 @@
 # release-notes-generator
 
-A Github Action for semantic-release/release-notes-generator
+A Github Action for [semantic-release/release-notes-generator](https://github.com/semantic-release/release-notes-generator)
 
 [![Build](https://github.com/Fresa/release-notes-generator/actions/workflows/ci.yml/badge.svg)](https://github.com/Fresa/release-notes-generator/actions/workflows/ci.yml)
 
@@ -27,7 +27,7 @@ jobs:
       - run: echo "${{ steps.release_notes.outputs.release_notes }}"
 ```
 
-### 📥 Inputs
+### Inputs
 
 - **github_token** _(required)_ - The Github token used to query this repository.(default: `${{ github.token }}`)
 - **version** _(required)_ - The version of the release.
