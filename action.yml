@@ -1,4 +1,4 @@
-name: 'Release Notes Generator'
+name: 'Semantic Release Notes Generator'
 description: 'Generates release notes using semantic-release/release-notes-generator'
 author: 'Fredrik Arvidsson'
 inputs:
