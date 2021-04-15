@@ -1,4 +1,4 @@
-# release-notes-generator
+# Semantic Release Notes Generator
 
 A Github Action for [semantic-release/release-notes-generator](https://github.com/semantic-release/release-notes-generator)
 
@@ -29,7 +29,6 @@ jobs:
 
 ### Inputs
 
-- **github_token** _(required)_ - The Github token used to query this repository.(default: `${{ github.token }}`)
 - **version** _(required)_ - The version of the release.
   Example: 2.4.0
 - **from_ref_exclusive** _(required)_ - The reference where to start gather commits. The referenced commit is not included.
@@ -46,3 +45,4 @@ jobs:
   - heads/master
   - master
   - 531c800
+- **github_token** _(optional)_ - The Github token used to query this repository.(default: `${{ github.token }}`)
