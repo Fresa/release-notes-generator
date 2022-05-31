@@ -44,19 +44,40 @@ jobs:
       - name: Determine Release Info
         id: release
         run: |
-          from_tag=$(git tag --points-at ${{ steps.gitversion.outputs.versionSourceSha }} | grep -m 1 ^v[0-9]*\.[0-9]*\.[0-9]* | head -1)
-          [[ -z "$from_tag" ]] && \
-            from_ref_exclusive=${{ steps.gitversion.outputs.versionSourceSha }} || \
-            from_ref_exclusive=$from_tag
+          default_branch=$(git remote show origin | awk '/HEAD branch/ {print $NF}')
+          log_format="{^^^^hash^^^^: ^^^^%H^^^^,^^^^message^^^^:^^^^%B^^^^}"
 
-          [[ -z "${{ steps.gitversion.outputs.preReleaseNumber }}" ]] && \
+          if [ "${{ github.ref_name }}" == "$default_branch" ]; then
+            # Is this a merge commit?
+            if [ $(git rev-parse HEAD^2 >/dev/null 2>/dev/null) ]; then
+              # Find what commit the merged branch branched from originally
+              from_ref_exclusive=$(diff -u <(git rev-list --first-parent HEAD^2) \
+                      <(git rev-list --first-parent HEAD) | \
+                  sed -ne 's/^ //p' | head -1)
+              # Find the commits
+              git log $from_ref_exclusive..HEAD^2 --first-parent --pretty=format:'$log_format' > commit_logs.txt
+            else
+              # Use this commit
+              from_ref_exclusive=$(git log -2 --pretty=format:"%H" | tail -1)
+              git log -1 --pretty=format:'$log_format' > commit_logs.txt
+            fi
+          else
+            # This will find the commits since this branch branched from default branch 
+            from_ref_exclusive=$(git rev-list master.. --first-parent | tail -1)
+            git log $default_branch.. --first-parent --pretty=format:'$log_format' > commit_logs.txt
+          fi
+
+          cat commit_logs.txt | \
+            sed 's/"/\\"/g' | \
+            sed 's/\^^^^/"/g' | \ 
+            sed "$ s/,$//" | \
+            sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/ /g' | \
+            awk 'BEGIN { print("[") } { print($0) } END { print("]") }' > commit_logs.json
+
+          [[ -z "${{ steps.gitversion.outputs.preReleaseTag }}" ]] && \
             is_prerelease=false || \
             is_prerelease=true
-
-          [[ $is_prerelease == true ]] && \
-            tag=v${{ steps.gitversion.outputs.majorMinorPatch }}-pre-${{ steps.gitversion.outputs.shortSha }} || \
-            tag=v${{ steps.gitversion.outputs.majorMinorPatch }}
-
+        
           echo "::set-output name=is_prerelease::$is_prerelease"
           echo "::set-output name=tag::$tag"
           echo "::set-output name=from_ref_exclusive::$from_ref_exclusive"
@@ -77,6 +98,7 @@ jobs:
           version: ${{ steps.release.outputs.tag }}
           from_ref_exclusive: ${{ steps.release.outputs.from_ref_exclusive }}
           to_ref_inclusive: ${{ steps.release.outputs.tag }}
+          commits: ./commit_logs.json
       - name: Package
         run: zip -rj artifacts.zip dist
       - name: Create Release

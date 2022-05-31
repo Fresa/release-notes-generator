@@ -2,16 +2,12 @@ name: 'Semantic Release Notes Generator'
 description: 'Generates release notes using semantic-release/release-notes-generator'
 author: 'Fredrik Arvidsson'
 inputs:
-  github_token:
-    description: 'The Github token used to query this repository'
-    required: true
-    default: ${{ github.token }}
   version:
     description: 'The version of the release'
     required: true
   from_ref_exclusive:
     description: >-
-      The commit reference to gather commits after. 
+      The commit reference where the release starts. 
       The reference can be a tag, a branch or a commit sha.
       Examples:
         tags/v1.0.1
@@ -22,7 +18,7 @@ inputs:
     required: true
   to_ref_inclusive:
     description: >-
-      The last commit reference to include. 
+      The last commit reference of the release. 
       The reference can be a tag, a branch or a commit sha.
       Examples:
         tags/v2.0.0
@@ -30,6 +26,12 @@ inputs:
         heads/master
         master
         531c800
+    required: true
+  path_to_commits:
+    description: >-
+      The path to a file containing the commit messages and shas to parse as release notes.
+      Should be formatted as a JSON list of commit message objects, example:
+        [{"hash": "62c0a92ed8c684f966391c97ef68fcd7560ff666", "message": "This is a commit message"}]
     required: true
 outputs:
   release_notes:

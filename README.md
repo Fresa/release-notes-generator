@@ -46,3 +46,7 @@ jobs:
   - master
   - 531c800
 - **github_token** _(optional)_ - The Github token used to query this repository.(default: `${{ github.token }}`)
+
+### Outputs
+
+- **release_notes** - The release notes.
