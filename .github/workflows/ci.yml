@@ -77,7 +77,7 @@ jobs:
           [[ -z "${{ steps.gitversion.outputs.preReleaseTag }}" ]] && \
             is_prerelease=false || \
             is_prerelease=true
-        
+
           echo "::set-output name=is_prerelease::$is_prerelease"
           echo "::set-output name=tag::$tag"
           echo "::set-output name=from_ref_exclusive::$from_ref_exclusive"
