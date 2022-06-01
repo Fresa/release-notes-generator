@@ -78,6 +78,10 @@ jobs:
             is_prerelease=false || \
             is_prerelease=true
 
+          [[ $is_prerelease == true ]] && \
+            tag=v${{ steps.gitversion.outputs.majorMinorPatch }}-pre-${{ steps.gitversion.outputs.shortSha }} || \
+            tag=v${{ steps.gitversion.outputs.majorMinorPatch }}
+            
           echo "::set-output name=is_prerelease::$is_prerelease"
           echo "::set-output name=tag::$tag"
           echo "::set-output name=from_ref_exclusive::$from_ref_exclusive"
