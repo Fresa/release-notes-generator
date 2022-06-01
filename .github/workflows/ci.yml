@@ -63,7 +63,7 @@ jobs:
             fi
           else
             # This will find the commits since this branch branched from default branch 
-            from_ref_exclusive=$(git rev-list master.. --first-parent | tail -1)
+            from_ref_exclusive=$(git rev-list $(git rev-list $default_branch.. --first-parent | tail -1)^ -n 1)
             git log $default_branch.. --first-parent --pretty=format:'$log_format' > commit_logs.txt
           fi
 
