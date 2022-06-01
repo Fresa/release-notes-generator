@@ -55,21 +55,21 @@ jobs:
                       <(git rev-list --first-parent HEAD) | \
                   sed -ne 's/^ //p' | head -1)
               # Find the commits
-              git log $from_ref_exclusive..HEAD^2 --first-parent --pretty=format:'$log_format' > commit_logs.txt
+              git log $from_ref_exclusive..HEAD^2 --first-parent --pretty=format:"$log_format" > commit_logs.txt
             else
               # Use this commit
               from_ref_exclusive=$(git log -2 --pretty=format:"%H" | tail -1)
-              git log -1 --pretty=format:'$log_format' > commit_logs.txt
+              git log -1 --pretty=format:"$log_format" > commit_logs.txt
             fi
           else
             # This will find the commits since this branch branched from default branch 
             from_ref_exclusive=$(git rev-list $(git rev-list $default_branch.. --first-parent | tail -1)^ -n 1)
-            git log $default_branch.. --first-parent --pretty=format:'$log_format' > commit_logs.txt
+            git log $default_branch.. --first-parent --pretty=format:"$log_format" > commit_logs.txt
           fi
 
           cat commit_logs.txt | \
             sed 's/"/\\"/g' | \
-            sed 's/\^^^^/"/g' | \ 
+            sed 's/\^^^^/"/g' | \
             sed "$ s/,$//" | \
             sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/ /g' | \
             awk 'BEGIN { print("[") } { print($0) } END { print("]") }' > commit_logs.json
