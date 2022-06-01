@@ -4,9 +4,7 @@ import { readFileSync } from 'fs';
 
 async function run(): Promise<void> {
   try {
-    const version = core.getInput('version');
-    const fromRef = core.getInput('from_ref_exclusive');
-    const toRef = core.getInput('to_ref_inclusive');
+    core.debug('test');
   } catch (error: any) {
     core.setFailed(`Action failed with error ${error}`);
   }
