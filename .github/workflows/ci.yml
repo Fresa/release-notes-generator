@@ -18,17 +18,20 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 12
+      - name: Test Fetching Artifact
+        run: |
+          GITHUB_ACTION_REPOSITORY=Fresa/release-notes-generator \
+          GITHUB_ACTION_REF=vTEST \
+          node fetch_artifact.js
+      - name: Clean dist
+        run: |
+          rm -rf dist
       - name: Install
         run: npm ci
       - name: Check
         run: npm run prettier-check
       - name: Build
         run: npm run publish
-      - name: Test Fetching Artifact
-        run: |
-          GITHUB_ACTION_REPOSITORY=Fresa/release-notes-generator \
-          GITHUB_ACTION_REF=vTEST \
-          node fetch_artifact.js
       - name: Assert Artifact Downloaded
         run: ls -d $GITHUB_WORKSPACE/dist/index.js
       - name: Install GitVersion
