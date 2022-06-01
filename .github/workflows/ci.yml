@@ -48,7 +48,7 @@ jobs:
         id: release
         run: |
           default_branch=$(git remote show origin | awk '/HEAD branch/ {print $NF}')
-          log_format="{^^^^hash^^^^: ^^^^%H^^^^,^^^^message^^^^:^^^^%B^^^^}"
+          log_format="{^^^^hash^^^^: ^^^^%H^^^^,^^^^message^^^^:^^^^%B^^^^},"
 
           if [ "${{ github.ref_name }}" == "$default_branch" ]; then
             # Is this a merge commit?
