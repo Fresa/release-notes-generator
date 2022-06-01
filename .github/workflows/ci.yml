@@ -81,7 +81,7 @@ jobs:
           [[ $is_prerelease == true ]] && \
             tag=v${{ steps.gitversion.outputs.majorMinorPatch }}-pre-${{ steps.gitversion.outputs.shortSha }} || \
             tag=v${{ steps.gitversion.outputs.majorMinorPatch }}
-            
+
           echo "::set-output name=is_prerelease::$is_prerelease"
           echo "::set-output name=tag::$tag"
           echo "::set-output name=from_ref_exclusive::$from_ref_exclusive"
@@ -102,7 +102,7 @@ jobs:
           version: ${{ steps.release.outputs.tag }}
           from_ref_exclusive: ${{ steps.release.outputs.from_ref_exclusive }}
           to_ref_inclusive: ${{ steps.release.outputs.tag }}
-          commits: ./commit_logs.json
+          path_to_commits: ./commit_logs.json
       - name: Package
         run: zip -rj artifacts.zip dist
       - name: Create Release
