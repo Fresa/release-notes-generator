@@ -2,10 +2,6 @@ name: 'Semantic Release Notes Generator'
 description: 'Generates release notes using semantic-release/release-notes-generator'
 author: 'Fredrik Arvidsson'
 inputs:
-  github_token:
-    description: 'The Github token used to query this repository'
-    required: true
-    default: ${{ github.token }}
   version:
     description: 'The version of the release'
     required: true
