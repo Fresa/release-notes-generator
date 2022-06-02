@@ -7,6 +7,7 @@ async function run(): Promise<void> {
     const version = core.getInput('version');
     const last_release_ref = core.getInput('last_release_ref');
     const release_ref = core.getInput('release_ref');
+    const path_to_commits = core.getInput('path_to_commits');
 
     const commits = JSON.parse(readFileSync(path_to_commits, 'utf-8'));
 
