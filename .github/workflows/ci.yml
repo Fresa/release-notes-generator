@@ -90,7 +90,7 @@ jobs:
         id: convert-commit-logs
         uses: mikefarah/yq@v4.25.2
         with:
-          cmd: yq ea -o=json '[.]' commit_logs.txt | tee commit_logs.json
+          cmd: yq ea -o=json 'select(. != null) | [.]' commit_logs.txt | tee commit_logs.json
       - name: Create Tag
         uses: actions/github-script@v3
         with:
