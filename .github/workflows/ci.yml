@@ -90,7 +90,7 @@ jobs:
         id: convert-commit-logs
         uses: mikefarah/yq@v4.25.2
         with:
-          cmd: yq ea -j '[.]' commit_logs.txt > commit_logs.json
+          cmd: yq ea -o=json '[.]' commit_logs.txt | tee commit_logs.json
       - name: Create Tag
         uses: actions/github-script@v3
         with:
@@ -99,15 +99,15 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               ref: "refs/tags/${{ steps.release.outputs.tag }}",
-              sha: "${{ steps.release.outputs.head_ref }}"
+              sha: "${{ steps.release.outputs.release_ref }}"
             });
       - name: Generate Release Notes
         id: release_notes
         uses: ./
         with:
           version: ${{ steps.release.outputs.tag }}
-          base_ref: ${{ steps.release.outputs.base_ref }}
-          head_ref: ${{ steps.release.outputs.head_ref }}
+          last_release_ref: ${{ steps.release.outputs.last_release_ref }}
+          release_ref: ${{ steps.release.outputs.release_ref }}
           path_to_commits: ./commit_logs.json
       - name: Package
         run: zip -rj artifacts.zip dist
