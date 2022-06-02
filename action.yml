@@ -5,9 +5,9 @@ inputs:
   version:
     description: 'The version of the release'
     required: true
-  from_ref_exclusive:
+  last_release_ref:
     description: >-
-      The commit reference where the release starts. 
+      The commit reference of the last release. 
       The reference can be a tag, a branch or a commit sha.
       Examples:
         tags/v1.0.1
@@ -16,9 +16,9 @@ inputs:
         my-branch
         431880b
     required: true
-  to_ref_inclusive:
+  release_ref:
     description: >-
-      The last commit reference of the release. 
+      The commit reference of this release. 
       The reference can be a tag, a branch or a commit sha.
       Examples:
         tags/v2.0.0

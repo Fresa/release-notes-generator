@@ -5,9 +5,8 @@ import { readFileSync } from 'fs';
 async function run(): Promise<void> {
   try {
     const version = core.getInput('version');
-    const fromRef = core.getInput('from_ref_exclusive');
-    const toRef = core.getInput('to_ref_inclusive');
-    const path_to_commits = core.getInput('path_to_commits');
+    const last_release_ref = core.getInput('last_release_ref');
+    const release_ref = core.getInput('release_ref');
 
     const commits = JSON.parse(readFileSync(path_to_commits, 'utf-8'));
 
@@ -19,8 +18,8 @@ async function run(): Promise<void> {
         options: {
           repositoryUrl: `https://github.com/${process.env.GITHUB_REPOSITORY}`
         },
-        lastRelease: { gitTag: fromRef },
-        nextRelease: { gitTag: toRef, version: version }
+        lastRelease: { gitTag: last_release_ref },
+        nextRelease: { gitTag: release_ref, version: version }
       }
     );
 
