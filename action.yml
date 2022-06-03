@@ -30,7 +30,10 @@ inputs:
   path_to_commits:
     description: >-
       The path to a file containing the commit messages and shas to parse as release notes.
-      Should be formatted as a JSON list of commit message objects, example:
+      Example:
+        ./commit-logs.json
+
+      The content of the file should be formatted as a JSON list of commit message objects, example:
         [{"hash": "62c0a92ed8c684f966391c97ef68fcd7560ff666", "message": "This is a commit message"}]
     required: true
 outputs:
