@@ -56,7 +56,7 @@ jobs:
 
           if [ "$current_branch" == "$default_branch" ]; then
             # Is this release a merge commit?
-            if [ $(git rev-parse $release_ref^2 >/dev/null 2>/dev/null) ]; then
+            if [ $(git rev-parse --verify $release_ref^2 2> /dev/null) ]; then
               # Find what commit this release branched from originally
               last_release_ref=$(diff -u <(git rev-list --first-parent $release_ref^2) \
                       <(git rev-list --first-parent $release_ref) | \
