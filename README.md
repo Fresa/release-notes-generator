@@ -29,7 +29,9 @@ jobs:
 ```
 
 ### Inputs / Outputs
+
 See [actions.yml](action.yml)
 
 ### Update from v0 -> v1
+
 In v0 commits was automatically gathered through Github's [compare api](https://docs.github.com/en/rest/commits/commits#compare-two-commits), however this API does not fully support all the traversing options that for example `git log` exposes which caused limitations. This has been removed in v1. It now instead acts as a pure facade of [semantic-release/release-notes-generator](https://github.com/semantic-release/release-notes-generator). Use `git log $last_release_ref...$release_ref` to get the same behaviour as in v0. For an example how to fetch commit logs for releases for a [trunk based branching model](https://trunkbaseddevelopment.com/), see `Determine Release Info` in [.github/workflows/ci.yml](.github/workflows/ci.yml).
