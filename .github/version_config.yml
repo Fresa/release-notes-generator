@@ -8,6 +8,7 @@ minor-version-bump-message: "(feat)(\\([a-z]+\\))?: .+"
 patch-version-bump-message: "(build|chore|ci|docs|fix|perf|refactor|revert|style|test)(\\([a-z]+\\))?: .+"
 # Match nothing
 no-bump-message: ^\b$
+next-version: v1.0.0-pre
 continuous-delivery-fallback-tag: ''
 branches:
   development:
@@ -15,6 +16,7 @@ branches:
     # Everything except main and master
     regex: ^(?!(main|master)$)
     track-merge-target: true
+    tracks-release-branches: true
     source-branches: []
   feature:
     # Match nothing
@@ -23,6 +25,7 @@ branches:
     # Match nothing
     regex: ^\b$
   main:
+    is-release-branch: true
     source-branches: []
   release:
     # Match nothing

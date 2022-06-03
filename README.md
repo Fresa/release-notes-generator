@@ -22,27 +22,16 @@ jobs:
         uses: fresa/release-notes-generator@master
         with:
           version: v2.0.0
-          from_ref_exclusive: v1.0.1
-          to_ref_inclusive: v2.0.0
+          last_release_ref: v1.0.1
+          release_ref: v2.0.0
+          path_to_commits: ./commits.json
       - run: echo "${{ steps.release_notes.outputs.release_notes }}"
 ```
 
-### Inputs
+### Inputs / Outputs
 
-- **version** _(required)_ - The version of the release.
-  Example: 2.4.0
-- **from_ref_exclusive** _(required)_ - The reference where to start gather commits. The referenced commit is not included.
-  Examples:
-  - tags/v1.0.1
-  - v1.0.1
-  - heads/my-branch
-  - my-branch
-  - 431880b
-- **to_ref_inclusive** _(required)_ - The reference where to stop gather commits. The referenced commit is included.
-  Examples:
-  - tags/v2.0.0
-  - v2.0.0
-  - heads/master
-  - master
-  - 531c800
-- **github_token** _(optional)_ - The Github token used to query this repository.(default: `${{ github.token }}`)
+See [actions.yml](action.yml)
+
+### Update from v0 -> v1
+
+In v0 commits was automatically gathered through Github's [compare api](https://docs.github.com/en/rest/commits/commits#compare-two-commits), however this API does not fully support all the traversing options that for example `git log` exposes which caused limitations. This has been removed in v1. It now instead acts as a pure facade of [semantic-release/release-notes-generator](https://github.com/semantic-release/release-notes-generator). Use `git log $last_release_ref...$release_ref` to get the same behaviour as in v0. For an example how to fetch commit logs for releases for a [trunk based branching model](https://trunkbaseddevelopment.com/), see `Determine Release Info` in [.github/workflows/ci.yml](.github/workflows/ci.yml).

@@ -18,17 +18,20 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 12
+      - name: Test Fetching Artifact
+        run: |
+          GITHUB_ACTION_REPOSITORY=Fresa/release-notes-generator \
+          GITHUB_ACTION_REF=vTEST \
+          node fetch_artifact.js
+      - name: Clean dist
+        run: |
+          rm -rf dist
       - name: Install
         run: npm ci
       - name: Check
         run: npm run prettier-check
       - name: Build
         run: npm run publish
-      - name: Test Fetching Artifact
-        run: |
-          GITHUB_ACTION_REPOSITORY=Fresa/release-notes-generator \
-          GITHUB_ACTION_REF=vTEST \
-          node fetch_artifact.js
       - name: Assert Artifact Downloaded
         run: ls -d $GITHUB_WORKSPACE/dist/index.js
       - name: Install GitVersion
@@ -44,12 +47,34 @@ jobs:
       - name: Determine Release Info
         id: release
         run: |
-          from_tag=$(git tag --points-at ${{ steps.gitversion.outputs.versionSourceSha }} | grep -m 1 ^v[0-9]*\.[0-9]*\.[0-9]* | head -1)
-          [[ -z "$from_tag" ]] && \
-            from_ref_exclusive=${{ steps.gitversion.outputs.versionSourceSha }} || \
-            from_ref_exclusive=$from_tag
+          default_branch=$(git remote show origin | awk '/HEAD branch/ {print $NF}')
+          current_branch=${{ github.ref_name }}
 
-          [[ -z "${{ steps.gitversion.outputs.preReleaseNumber }}" ]] && \
+          log_format="hash: %H%nmessage: | %n %s%n%n %b%n---"
+
+          release_ref=${{ steps.gitversion.outputs.sha }}
+
+          if [ "$current_branch" == "$default_branch" ]; then
+            # Is this release a merge commit?
+            if [ $(git rev-parse --verify $release_ref^2 2> /dev/null) ]; then
+              # Find what commit this release branched from originally
+              last_release_ref=$(diff -u <(git rev-list --first-parent $release_ref^2) \
+                      <(git rev-list --first-parent $release_ref) | \
+                  sed -ne 's/^ //p' | head -1)
+              # Find the commits that origins from the merged branch
+              git log $last_release_ref..$release_ref^2 --first-parent --pretty=format:"$log_format" > commit_logs.txt
+            else
+              # Use last commit as last release
+              last_release_ref=$(git rev-list -2 $current_branch | tail -1)
+              git log $last_release_ref..$release_ref --pretty=format:"$log_format" > commit_logs.txt
+            fi
+          else
+            # This will find the commits since this branch branched from default branch 
+            last_release_ref=$(git rev-list -1 $default_branch)
+            git log $last_release_ref..$release_ref --pretty=format:"$log_format" > commit_logs.txt
+          fi
+
+          [[ -z "${{ steps.gitversion.outputs.preReleaseTag }}" ]] && \
             is_prerelease=false || \
             is_prerelease=true
 
@@ -59,7 +84,13 @@ jobs:
 
           echo "::set-output name=is_prerelease::$is_prerelease"
           echo "::set-output name=tag::$tag"
-          echo "::set-output name=from_ref_exclusive::$from_ref_exclusive"
+          echo "::set-output name=last_release_ref::$last_release_ref"
+          echo "::set-output name=release_ref::$release_ref"
+      - name: Convert Commit Logs to JSON
+        id: convert-commit-logs
+        uses: mikefarah/yq@v4.25.2
+        with:
+          cmd: yq ea -o=json 'select(. != null) | [.]' commit_logs.txt | tee commit_logs.json
       - name: Create Tag
         uses: actions/github-script@v3
         with:
@@ -68,15 +99,16 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               ref: "refs/tags/${{ steps.release.outputs.tag }}",
-              sha: "${{ steps.gitversion.outputs.sha }}"
+              sha: "${{ steps.release.outputs.release_ref }}"
             });
       - name: Generate Release Notes
         id: release_notes
         uses: ./
         with:
           version: ${{ steps.release.outputs.tag }}
-          from_ref_exclusive: ${{ steps.release.outputs.from_ref_exclusive }}
-          to_ref_inclusive: ${{ steps.release.outputs.tag }}
+          last_release_ref: ${{ steps.release.outputs.last_release_ref }}
+          release_ref: ${{ steps.release.outputs.release_ref }}
+          path_to_commits: ./commit_logs.json
       - name: Package
         run: zip -rj artifacts.zip dist
       - name: Create Release

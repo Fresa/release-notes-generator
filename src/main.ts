@@ -1,28 +1,15 @@
 import * as core from '@actions/core';
 import { generateNotes } from '@semantic-release/release-notes-generator';
-import { context, getOctokit } from '@actions/github';
+import { readFileSync } from 'fs';
 
 async function run(): Promise<void> {
   try {
     const version = core.getInput('version');
-    const fromRef = core.getInput('from_ref_exclusive');
-    const toRef = core.getInput('to_ref_inclusive');
-    const githubToken = core.getInput('github_token');
+    const last_release_ref = core.getInput('last_release_ref');
+    const release_ref = core.getInput('release_ref');
+    const path_to_commits = core.getInput('path_to_commits');
 
-    const octokit = getOctokit(githubToken);
-
-    const commits = (
-      await octokit.repos.compareCommits({
-        ...context.repo,
-        base: fromRef,
-        head: toRef
-      })
-    ).data.commits
-      .filter((commit) => !!commit.commit.message)
-      .map((commit) => ({
-        message: commit.commit.message,
-        hash: commit.sha
-      }));
+    const commits = JSON.parse(readFileSync(path_to_commits, 'utf-8'));
 
     const releaseNotes = await generateNotes(
       {},
@@ -32,15 +19,15 @@ async function run(): Promise<void> {
         options: {
           repositoryUrl: `https://github.com/${process.env.GITHUB_REPOSITORY}`
         },
-        lastRelease: { gitTag: fromRef },
-        nextRelease: { gitTag: toRef, version: version }
+        lastRelease: { gitTag: last_release_ref },
+        nextRelease: { gitTag: release_ref, version: version }
       }
     );
 
     core.info(`Release notes: ${releaseNotes}`);
     core.setOutput('release_notes', releaseNotes);
-  } catch (error) {
-    core.setFailed(`Action failed with error ${error.stack}`);
+  } catch (error: any) {
+    core.setFailed(`Action failed with error ${error}`);
   }
 }
 
