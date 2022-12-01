@@ -40,7 +40,7 @@ outputs:
   release_notes:
     description: 'Semantic release notes'
 runs:
-  using: 'node12'
+  using: 'node16'
   pre: 'fetch_artifact.js'
   main: 'dist/index.js'
 branding:
