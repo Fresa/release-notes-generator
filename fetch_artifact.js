@@ -2,6 +2,7 @@ const fs = require('fs');
 const https = require('https');
 const os = require('os');
 const spawn = require('child_process').spawn;
+const githubCore = require('@actions/core');
 
 const core = new (class {
   setFailed(message) {
@@ -90,6 +91,11 @@ try {
   const action_ref = getEnvironmentVariable('GITHUB_ACTION_REF');
   const server_url = getEnvironmentVariable('GITHUB_SERVER_URL');
   const api_url = getEnvironmentVariable('GITHUB_API_URL');
+  const token = githubCore.getInput('github_token', { required: true });
+
+  if (token){
+    core.info("Token set");
+  }
 
   const ensureSuccessStatusCode = (response) => {
     if (response.status !== 200) {
