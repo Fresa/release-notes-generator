@@ -92,8 +92,8 @@ try {
   const api_url = getEnvironmentVariable('GITHUB_API_URL');
   const token = getEnvironmentVariable('INPUT_GITHUB_TOKEN');
 
-  if (token){
-    core.info("Token set");
+  if (token) {
+    core.info('Token set');
   }
 
   const ensureSuccessStatusCode = (response) => {
