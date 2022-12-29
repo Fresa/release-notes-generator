@@ -22,58 +22,6 @@ const core = new (class {
   }
 })();
 
-const getAsync = async (url, asStream = false) => {
-  const getAsyncCalback = (url, resolve, reject) => {
-    https.get(
-      url,
-      {
-        headers: {
-          Accept: asStream ? 'text/html' : 'application/vnd.github.v3+json',
-          'User-Agent': 'artifact-downloader'
-        }
-      },
-      (res) => {
-        if (res.statusCode === 301 || res.statusCode === 302) {
-          return getAsyncCalback(res.headers.location, resolve, reject);
-        }
-
-        if (asStream) {
-          return resolve({
-            status: res.statusCode,
-            statusText: res.statusMessage,
-            data: res
-          });
-        }
-
-        let rawData = '';
-        res.on('data', (chunk) => {
-          rawData += chunk;
-        });
-        res.on('end', () => {
-          resolve({
-            status: res.statusCode,
-            statusText: res.statusMessage,
-            data: JSON.parse(rawData)
-          });
-        });
-        res.on('error', (err) => {
-          reject({
-            error: {
-              status: res.statusCode,
-              statusText: res.statusMessage,
-              data: err
-            }
-          });
-        });
-      }
-    );
-  };
-
-  return new Promise((resolve, reject) =>
-    getAsyncCalback(url, resolve, reject)
-  );
-};
-
 const getEnvironmentVariable = (name) => {
   const value = process.env[name];
   if (['', null, undefined].includes(value)) {
@@ -90,6 +38,60 @@ try {
   const action_ref = getEnvironmentVariable('GITHUB_ACTION_REF');
   const server_url = getEnvironmentVariable('GITHUB_SERVER_URL');
   const api_url = getEnvironmentVariable('GITHUB_API_URL');
+  const token = getEnvironmentVariable('INPUT_GITHUB_TOKEN');
+
+  const getAsync = async (url, asStream = false) => {
+    const getAsyncCalback = (url, resolve, reject) => {
+      https.get(
+        url,
+        {
+          headers: {
+            Accept: asStream ? 'text/html' : 'application/vnd.github.v3+json',
+            'User-Agent': 'artifact-downloader',
+            Authorization: `Bearer ${token}`
+          }
+        },
+        (res) => {
+          if (res.statusCode === 301 || res.statusCode === 302) {
+            return getAsyncCalback(res.headers.location, resolve, reject);
+          }
+
+          if (asStream) {
+            return resolve({
+              status: res.statusCode,
+              statusText: res.statusMessage,
+              data: res
+            });
+          }
+
+          let rawData = '';
+          res.on('data', (chunk) => {
+            rawData += chunk;
+          });
+          res.on('end', () => {
+            resolve({
+              status: res.statusCode,
+              statusText: res.statusMessage,
+              data: JSON.parse(rawData)
+            });
+          });
+          res.on('error', (err) => {
+            reject({
+              error: {
+                status: res.statusCode,
+                statusText: res.statusMessage,
+                data: err
+              }
+            });
+          });
+        }
+      );
+    };
+
+    return new Promise((resolve, reject) =>
+      getAsyncCalback(url, resolve, reject)
+    );
+  };
 
   const ensureSuccessStatusCode = (response) => {
     if (response.status !== 200) {

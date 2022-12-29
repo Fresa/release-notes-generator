@@ -36,6 +36,10 @@ inputs:
       The content of the file should be formatted as a JSON list of commit message objects, example:
         [{"hash": "62c0a92ed8c684f966391c97ef68fcd7560ff666", "message": "This is a commit message"}]
     required: true
+  github_token:
+    description: 'Authorized GitHub Access Token used to fetch the release notes generator. Defaults to github.token'
+    required: false
+    default: ${{ github.token }}
 outputs:
   release_notes:
     description: 'Semantic release notes'

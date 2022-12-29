@@ -22,6 +22,7 @@ jobs:
         run: |
           GITHUB_ACTION_REPOSITORY=Fresa/release-notes-generator \
           GITHUB_ACTION_REF=vTEST \
+          INPUT_GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} \
           node fetch_artifact.js
       - name: Clean dist
         run: |
@@ -34,63 +35,33 @@ jobs:
         run: npm run publish
       - name: Assert Artifact Downloaded
         run: ls -d $GITHUB_WORKSPACE/dist/index.js
-      - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v0.9.7
-        with:
-          versionSpec: '5.x'
-      - name: Determine Version
-        id: gitversion
-        uses: gittools/actions/gitversion/execute@v0
-        with:
-          useConfigFile: true
-          configFilePath: .github/version_config.yml
-      - name: Determine Release Info
-        id: release
+      - name: Determine Release Version
+        id: versioning
+        uses: Fresa/trunk-based-release-versioning@v0
+      - name: Determine Release Tag
+        id: release-tag
         run: |
-          default_branch=$(git remote show origin | awk '/HEAD branch/ {print $NF}')
-          current_branch=${{ github.ref_name }}
-
-          log_format="hash: %H%nmessage: | %n %s%n%n %b%n---"
-
-          release_ref=${{ steps.gitversion.outputs.sha }}
-
-          if [ "$current_branch" == "$default_branch" ]; then
-            # Is this release a merge commit?
-            if [ $(git rev-parse --verify $release_ref^2 2> /dev/null) ]; then
-              # Find what commit this release branched from originally
-              last_release_ref=$(diff -u <(git rev-list --first-parent $release_ref^2) \
-                      <(git rev-list --first-parent $release_ref) | \
-                  sed -ne 's/^ //p' | head -1)
-              # Find the commits that origins from the merged branch
-              git log $last_release_ref..$release_ref^2 --first-parent --pretty=format:"$log_format" > commit_logs.txt
-            else
-              # Use last commit as last release
-              last_release_ref=$(git rev-list -2 $current_branch | tail -1)
-              git log $last_release_ref..$release_ref --pretty=format:"$log_format" > commit_logs.txt
-            fi
-          else
-            # This will find the commits since this branch branched from default branch 
-            last_release_ref=$(git rev-list -1 $default_branch)
-            git log $last_release_ref..$release_ref --pretty=format:"$log_format" > commit_logs.txt
+          tag=v${{ steps.versioning.outputs.version }}
+          if ${{ steps.versioning.outputs.is-prerelease }}; then
+            tag="$tag-pre-$(echo ${{ steps.versioning.outputs.release-ref }} | cut -c1-8)"
           fi
 
-          [[ -z "${{ steps.gitversion.outputs.preReleaseTag }}" ]] && \
-            is_prerelease=false || \
-            is_prerelease=true
-
-          [[ $is_prerelease == true ]] && \
-            tag=v${{ steps.gitversion.outputs.majorMinorPatch }}-pre-${{ steps.gitversion.outputs.shortSha }} || \
-            tag=v${{ steps.gitversion.outputs.majorMinorPatch }}
-
-          echo "::set-output name=is_prerelease::$is_prerelease"
-          echo "::set-output name=tag::$tag"
-          echo "::set-output name=last_release_ref::$last_release_ref"
-          echo "::set-output name=release_ref::$release_ref"
+          echo "tag=$tag" >> $GITHUB_OUTPUT
       - name: Convert Commit Logs to JSON
         id: convert-commit-logs
         uses: mikefarah/yq@v4.25.2
         with:
-          cmd: yq ea -o=json 'select(. != null) | [.]' commit_logs.txt | tee commit_logs.json
+          cmd: yq ea -o=json 'select(. != null) | [.]' "$(echo "${{ steps.versioning.outputs.commit-logs-path }}" | sed "s|^${{ github.workspace }}/||")" | tee commit_logs.json
+      - name: Generate Release Notes
+        id: release_notes
+        uses: ./
+        with:
+          version: ${{ steps.release-tag.outputs.tag }}
+          last_release_ref: ${{ steps.versioning.outputs.last-release-ref }}
+          release_ref: ${{ steps.versioning.outputs.release-ref }}
+          path_to_commits: ./commit_logs.json
+      - name: Package
+        run: zip -rj artifacts.zip dist
       - name: Create Tag
         uses: actions/github-script@v3
         with:
@@ -98,37 +69,27 @@ jobs:
             github.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: "refs/tags/${{ steps.release.outputs.tag }}",
-              sha: "${{ steps.release.outputs.release_ref }}"
+              ref: "refs/tags/${{ steps.release-tag.outputs.tag }}",
+              sha: "${{ steps.versioning.outputs.release-ref }}"
             });
-      - name: Generate Release Notes
-        id: release_notes
-        uses: ./
-        with:
-          version: ${{ steps.release.outputs.tag }}
-          last_release_ref: ${{ steps.release.outputs.last_release_ref }}
-          release_ref: ${{ steps.release.outputs.release_ref }}
-          path_to_commits: ./commit_logs.json
-      - name: Package
-        run: zip -rj artifacts.zip dist
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           body: ${{ steps.release_notes.outputs.release_notes }}
-          tag_name: ${{ steps.release.outputs.tag }}
-          prerelease: ${{ steps.release.outputs.is_prerelease }}
+          tag_name: ${{ steps.release-tag.outputs.tag }}
+          prerelease: ${{ steps.versioning.outputs.is-prerelease }}
           files: artifacts.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Update Latest Minor Tag
         uses: EndBug/latest-tag@v1
-        if: steps.release.outputs.is_prerelease == 'false'
+        if: steps.versioning.outputs.is-prerelease == 'false'
         with:
-          tag-name: v${{ steps.gitversion.outputs.major }}
-          description: ${{ steps.release.outputs.tag }}
+          ref: v${{ steps.versioning.outputs.major-version }}
+          description: ${{ steps.release-tag.outputs.tag }}
       - name: Update Latest Patch Tag
         uses: EndBug/latest-tag@v1
-        if: steps.release.outputs.is_prerelease == 'false'
+        if: steps.versioning.outputs.is-prerelease == 'false'
         with:
-          tag-name: v${{ steps.gitversion.outputs.major }}.${{ steps.gitversion.outputs.minor }}
-          description: ${{ steps.release.outputs.tag }}
+          ref: v${{ steps.versioning.outputs.major-version }}.${{ steps.versioning.outputs.minor-version }}
+          description: ${{ steps.release-tag.outputs.tag }}
