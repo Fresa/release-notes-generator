@@ -350,7 +350,3 @@ MigrationBackup/
 .ionide/
 lib/
 dist/
-
-# Needed by the action runner as referenced in fetch_artifact.js
-!node_modules/@actions/
-!node_modules/@actions/core/lib
