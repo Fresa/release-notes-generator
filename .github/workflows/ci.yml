@@ -69,8 +69,8 @@ jobs:
             github.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: "refs/tags/${{ steps.release.outputs.tag }}",
-              sha: "${{ steps.release.outputs.release_ref }}"
+              ref: "refs/tags/${{ steps.release-tag.outputs.tag }}",
+              sha: "${{ steps.versioning.outputs.release-ref }}"
             });
       - name: Create Release
         uses: softprops/action-gh-release@v1
