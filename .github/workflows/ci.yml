@@ -22,7 +22,7 @@ jobs:
         run: |
           GITHUB_ACTION_REPOSITORY=Fresa/release-notes-generator \
           GITHUB_ACTION_REF=vTEST \
-          INPUT_GITHUB_TOKEN=test \
+          INPUT_GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} \
           node fetch_artifact.js
       - name: Clean dist
         run: |
