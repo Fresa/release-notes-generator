@@ -4,18 +4,19 @@ on:
   push:
     branches:
       - '**'
-
+    tags-ignore:
+      - '**'
 jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           # Fetches entire history, so we can analyze commits since last tag
           fetch-depth: 0
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 16
       - name: Test Fetching Artifact
@@ -49,7 +50,7 @@ jobs:
           echo "tag=$tag" >> $GITHUB_OUTPUT
       - name: Convert Commit Logs to JSON
         id: convert-commit-logs
-        uses: mikefarah/yq@v4.25.2
+        uses: mikefarah/yq@v4.30.6
         with:
           cmd: yq ea -o=json 'select(. != null) | [.]' "$(echo "${{ steps.versioning.outputs.commit-logs-path }}" | sed "s|^${{ github.workspace }}/||")" | tee commit_logs.json
       - name: Generate Release Notes
@@ -60,10 +61,13 @@ jobs:
           last_release_ref: ${{ steps.versioning.outputs.last-release-ref }}
           release_ref: ${{ steps.versioning.outputs.release-ref }}
           path_to_commits: ./commit_logs.json
+      - name: Write Release Notes to File
+        run: |
+          echo "${{ steps.release_notes.outputs.release_notes }}" > "release_notes.txt"
       - name: Package
         run: zip -rj artifacts.zip dist
       - name: Create Tag
-        uses: actions/github-script@v3
+        uses: actions/github-script@v7
         with:
           script: |
             github.git.createRef({
@@ -73,9 +77,9 @@ jobs:
               sha: "${{ steps.versioning.outputs.release-ref }}"
             });
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
-          body: ${{ steps.release_notes.outputs.release_notes }}
+          body_path: release_notes.txt
           tag_name: ${{ steps.release-tag.outputs.tag }}
           prerelease: ${{ steps.versioning.outputs.is-prerelease }}
           files: artifacts.zip
