@@ -41,19 +41,23 @@ try {
   const token = getEnvironmentVariable('INPUT_GITHUB_TOKEN');
 
   const getAsync = async (url, asStream = false) => {
-    const getAsyncCalback = (url, resolve, reject) => {
+    const getAsyncCalback = (url, resolve, reject, redirect = false) => {
       https.get(
         url,
         {
-          headers: {
-            Accept: asStream ? 'text/html' : 'application/vnd.github.v3+json',
-            'User-Agent': 'artifact-downloader',
-            Authorization: `Bearer ${token}`
-          }
+          headers: redirect
+            ? undefined
+            : {
+                Accept: asStream
+                  ? 'text/html'
+                  : 'application/vnd.github.v3+json',
+                'User-Agent': 'artifact-downloader',
+                Authorization: `Bearer ${token}`
+              }
         },
         (res) => {
           if (res.statusCode === 301 || res.statusCode === 302) {
-            return getAsyncCalback(res.headers.location, resolve, reject);
+            return getAsyncCalback(res.headers.location, resolve, reject, true);
           }
 
           if (asStream) {
