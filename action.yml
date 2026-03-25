@@ -46,7 +46,7 @@ outputs:
 runs:
   using: 'node24'
   pre: 'fetch_artifact.js'
-  main: 'dist/index.js'
+  main: 'dist/main.mjs'
 branding:
   icon: 'file-text'
   color: 'orange'
