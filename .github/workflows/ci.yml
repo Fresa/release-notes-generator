@@ -10,10 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    outputs:
-      tag: ${{ steps.release-tag.outputs.tag }}
-      last-release-ref: ${{ steps.versioning.outputs.last-release-ref }}
-      release-ref: ${{ steps.versioning.outputs.release-ref }}
 
     steps:
       - uses: actions/checkout@v6
@@ -103,21 +99,3 @@ jobs:
         with:
           ref: v${{ steps.versioning.outputs.major-version }}.${{ steps.versioning.outputs.minor-version }}
           description: ${{ steps.release-tag.outputs.tag }}
-
-  verify:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    needs: build
-    steps:
-      - run: echo "$COMMITS" > commit_logs.json
-        env:
-          COMMITS: '[{"hash":"abc1234","message":"chore: verify release"}]'
-      - name: Verify Release
-        uses: jenseng/dynamic-uses@v1
-        with:
-          uses: Fresa/release-notes-generator@${{ needs.build.outputs.tag }}
-          with: |
-            version: ${{ needs.build.outputs.tag }}
-            last_release_ref: ${{ needs.build.outputs.last-release-ref }}
-            release_ref: ${{ needs.build.outputs.release-ref }}
-            path_to_commits: ./commit_logs.json
