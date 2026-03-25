@@ -113,6 +113,8 @@ jobs:
           ref: verify
       - name: Trigger Verify
         run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           TAG=${{ needs.build.outputs.tag }}
           VERIFY_TAG=verify-$(openssl rand -hex 8)
           cat > .github/workflows/verify.yml << EOF
