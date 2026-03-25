@@ -109,7 +109,9 @@ jobs:
     timeout-minutes: 5
     needs: build
     steps:
-      - run: echo '[{"hash":"abc1234","message":"chore: verify release"}]' > commit_logs.json
+      - run: echo "$COMMITS" > commit_logs.json
+        env:
+          COMMITS: '[{"hash":"abc1234","message":"chore: verify release"}]'
       - name: Verify Release
         uses: jenseng/dynamic-uses@v1
         with:
