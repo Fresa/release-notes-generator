@@ -18,7 +18,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 22
       - name: Test Fetching Artifact
         run: |
           GITHUB_ACTION_REPOSITORY=Fresa/release-notes-generator \
