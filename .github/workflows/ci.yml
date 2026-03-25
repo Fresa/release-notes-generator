@@ -37,7 +37,7 @@ jobs:
       - name: Build
         run: npm run publish
       - name: Assert Artifact Downloaded
-        run: ls -d $GITHUB_WORKSPACE/dist/main.mjs
+        run: ls -d $GITHUB_WORKSPACE/dist/main.js
       - name: Determine Release Version
         id: versioning
         uses: Fresa/trunk-based-release-versioning@v0
