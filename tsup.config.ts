@@ -5,5 +5,11 @@ export default defineConfig({
   format: ['esm'],
   minify: true,
   splitting: false,
-  noExternal: [/.*/]
+  noExternal: [/.*/],
+  banner: {
+    js: `
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+`
+  }
 });
