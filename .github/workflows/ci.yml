@@ -69,7 +69,7 @@ jobs:
       - name: Package
         run: zip -rj artifacts.zip dist
       - name: Create Tag
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             github.rest.git.createRef({
