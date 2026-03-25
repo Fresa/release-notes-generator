@@ -3,7 +3,7 @@
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
-    "publish": "tsup src/main.ts --format esm --minify --no-splitting",
+    "publish": "tsup",
     "prettier-check": "prettier --check .",
     "prettier-format": "prettier --config .prettierrc --write .",
     "lint": "eslint ."
