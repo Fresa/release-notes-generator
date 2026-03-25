@@ -99,3 +99,12 @@ jobs:
         with:
           ref: v${{ steps.versioning.outputs.major-version }}.${{ steps.versioning.outputs.minor-version }}
           description: ${{ steps.release-tag.outputs.tag }}
+      - name: Verify Release
+        uses: jenseng/dynamic-uses@v1
+        with:
+          uses: Fresa/release-notes-generator@${{ steps.release-tag.outputs.tag }}
+          with: |
+            version=${{ steps.release-tag.outputs.tag }}
+            last_release_ref=${{ steps.versioning.outputs.last-release-ref }}
+            release_ref=${{ steps.versioning.outputs.release-ref }}
+            path_to_commits=./commit_logs.json
