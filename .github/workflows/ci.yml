@@ -4,15 +4,12 @@ on:
   push:
     branches:
       - '**'
-      - '!verify'
     tags-ignore:
       - '**'
 jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    outputs:
-      tag: ${{ steps.release-tag.outputs.tag }}
 
     steps:
       - uses: actions/checkout@v6
@@ -102,47 +99,3 @@ jobs:
         with:
           ref: v${{ steps.versioning.outputs.major-version }}.${{ steps.versioning.outputs.minor-version }}
           description: ${{ steps.release-tag.outputs.tag }}
-
-  trigger-verify:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    needs: build
-    permissions:
-      contents: write
-      workflows: write
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          ref: verify
-      - name: Trigger Verify
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          TAG=${{ needs.build.outputs.tag }}
-          VERIFY_TAG=verify-$(openssl rand -hex 8)
-          cat > .github/workflows/verify.yml << EOF
-          name: Verify
-          on:
-            push:
-              tags:
-                - '$VERIFY_TAG'
-          jobs:
-            verify:
-              runs-on: ubuntu-latest
-              timeout-minutes: 5
-              steps:
-                - run: echo "\$COMMITS" > commit_logs.json
-                  env:
-                    COMMITS: '[{"hash":"abc1234","message":"chore: verify release"}]'
-                - uses: Fresa/release-notes-generator@$TAG
-                  with:
-                    version: $TAG
-                    last_release_ref: main
-                    release_ref: $TAG
-                    path_to_commits: ./commit_logs.json
-          EOF
-          git add .github/workflows/verify.yml
-          git commit -m "verify $TAG"
-          git tag -a "$VERIFY_TAG" -m "$TAG"
-          git push origin verify
-          git push origin "$VERIFY_TAG"
