@@ -3,10 +3,10 @@
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
-    "publish": "ncc build -m src/main.ts",
+    "publish": "tsup",
     "prettier-check": "prettier --check .",
     "prettier-format": "prettier --config .prettierrc --write .",
-    "lint": "eslint . --ext .ts"
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",
@@ -15,19 +15,18 @@
   "author": "Fredrik Arvidsson",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.10.0",
-    "@semantic-release/release-notes-generator": "^10.0.3"
+    "@actions/core": "^3.0.0",
+    "@semantic-release/release-notes-generator": "^14.1.0"
   },
   "devDependencies": {
-    "@types/node": "^18.11.10",
-    "@typescript-eslint/eslint-plugin": "^4.17.0",
-    "@typescript-eslint/parser": "^4.17.0",
-    "@vercel/ncc": "^0.27.0",
-    "eslint": "^7.21.0",
-    "eslint-config-prettier": "^8.1.0",
-    "eslint-plugin-prettier": "^3.3.1",
+    "@types/node": "^24.0.0",
+    "eslint": "^10.1.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
     "onchange": "^7.1.0",
-    "prettier": "^2.2.1",
-    "typescript": "^4.2.3"
+    "prettier": "^3.8.1",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.57.2"
   }
 }

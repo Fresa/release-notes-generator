@@ -3,7 +3,7 @@ declare module '@semantic-release/release-notes-generator' {
     config: {
       preset?: string;
       config?: string;
-      parserOpts?: any;
+      parserOpts?: Record<string, unknown>;
       releaseRules?:
         | string
         | {
@@ -15,7 +15,7 @@ declare module '@semantic-release/release-notes-generator' {
     },
     args: {
       commits: { message: string; hash: string | null }[];
-      logger: { log: (args: any) => void };
+      logger: { log: (message: string) => void };
       options: {
         repositoryUrl: string;
       };

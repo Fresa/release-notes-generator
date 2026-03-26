@@ -12,13 +12,13 @@ jobs:
     timeout-minutes: 5
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           # Fetches entire history, so we can analyze commits since last tag
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: 16
+          node-version: 24
       - name: Test Fetching Artifact
         run: |
           GITHUB_ACTION_REPOSITORY=Fresa/release-notes-generator \
@@ -32,10 +32,12 @@ jobs:
         run: npm ci
       - name: Check
         run: npm run prettier-check
+      - name: Lint
+        run: npm run lint
       - name: Build
         run: npm run publish
       - name: Assert Artifact Downloaded
-        run: ls -d $GITHUB_WORKSPACE/dist/index.js
+        run: ls -d $GITHUB_WORKSPACE/dist/main.js
       - name: Determine Release Version
         id: versioning
         uses: Fresa/trunk-based-release-versioning@v0
@@ -67,7 +69,7 @@ jobs:
       - name: Package
         run: zip -rj artifacts.zip dist
       - name: Create Tag
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             github.rest.git.createRef({
