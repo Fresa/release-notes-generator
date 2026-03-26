@@ -1,0 +1,24 @@
+name: Run Action
+
+on:
+  push:
+    branches:
+      - 'verify'
+    tags-ignore:
+      - '**'
+
+jobs:
+  run-action:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - run: |
+          echo '[{"hash":"abc1234","message":"feat: add new feature"},{"hash":"def5678","message":"fix: resolve bug"}]' > commit_logs.json
+      - name: Generate Release Notes
+        uses: Fresa/release-notes-generator@v4.0.0-pre-2b6156e0
+        with:
+          version: v1.2.0
+          last_release_ref: v1.0.0
+          release_ref: v1.2.0
+          path_to_commits: ./commit_logs.json
